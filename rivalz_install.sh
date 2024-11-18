@@ -43,32 +43,36 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 FILE="/usr/lib/node_modules/rivalz-node-cli/node_modules/systeminformation/lib/filesystem.js"
 
 find_file_path() {
- local search_path="$1"
- find "$search_path" -type f -name "filesystem.js" 2>/dev/null | grep "systeminformation/lib/filesystem.js" | head -n 1
+   local search_path="$1"
+   find "$search_path" -type f -name "filesystem.js" 2>/dev/null | grep "systeminformation/lib/filesystem.js" | head -n 1
 }
 
 if [ ! -f "$FILE" ]; then
- echo "File not found at $FILE. Attempting to locate it..."
- FILE=$(find_file_path "/usr/lib")
- 
- if [ -z "$FILE" ]; then
-   FILE=$(find_file_path "/usr/local/lib")
- fi
- 
- if [ -z "$FILE" ]; then
-   FILE=$(find_file_path "/opt")
- fi
- 
- if [ -z "$FILE" ]; then
-   FILE=$(find_file_path "$HOME/.nvm")
- fi
- 
- if [ -z "$FILE" ]; then
-   echo "Error: filesystem.js not found. Make sure npm is installed and the file path is correct."
-   exit 1
- fi
+   echo "File not found at $FILE. Attempting to locate it..."
+   FILE=$(find_file_path "/usr/lib")
+   
+   if [ -z "$FILE" ]; then
+       FILE=$(find_file_path "/usr/local/lib")
+   fi
+   
+   if [ -z "$FILE" ]; then
+       FILE=$(find_file_path "/opt")
+   fi
 
- echo "File found at $FILE"
+   if [ -z "$FILE" ]; then
+       FILE=$(find_file_path "/root/.nvm")
+   fi
+   
+   if [ -z "$FILE" ]; then
+       FILE=$(find_file_path "$HOME/.nvm")
+   fi
+
+   if [ -z "$FILE" ]; then
+       echo "Error: filesystem.js not found. Make sure npm is installed and the file path is correct."
+       exit 1
+   fi
+
+   echo "File found at $FILE"
 fi
 
 TMP_FILE=$(mktemp)
@@ -78,11 +82,11 @@ NEW_LINE="devices = outJSON.blockdevices.filter(item => { return (item.type === 
 
 while IFS= read -r line
 do
- if [[ "$line" == *"$ORIGINAL_LINE"* ]]; then
-   echo "$NEW_LINE" >> "$TMP_FILE"
- else
-   echo "$line" >> "$TMP_FILE"
- fi
+   if [[ "$line" == *"$ORIGINAL_LINE"* ]]; then
+       echo "$NEW_LINE" >> "$TMP_FILE"
+   else
+       echo "$line" >> "$TMP_FILE"
+   fi
 done < "$FILE"
 
 mv "$TMP_FILE" "$FILE"
