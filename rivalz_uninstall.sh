@@ -24,11 +24,16 @@ rm -f "$SCRIPT_DIR/apply_disk_fix.sh"
 rm -f "$SCRIPT_DIR/rivalz_auto_update.sh"
 
 echo -e "\033[1;34m\nUninstalling Rivalz CLI...\033[0m"
-npm uninstall -g rivalz-node-cli
+if command -v npm >/dev/null 2>&1; then
+   npm uninstall -g rivalz-node-cli
+fi
 
 echo -e "\033[1;34m\nRemoving Node.js...\033[0m"
-apt-get remove nodejs -y
-apt-get purge nodejs -y
+if dpkg -l | grep -q nodejs; then
+   apt-get remove nodejs -y
+   apt-get purge nodejs -y
+fi
+
 apt-get autoremove -y
 
 echo -e "\033[1;34m\nRemoving Node.js repository...\033[0m"
